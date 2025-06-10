@@ -10,7 +10,7 @@ namespace SibCCSPETest.ServiceBase
         public SpecializationAPIService(IHttpClientFactory httpClienFactory)
         {
             _httpClient = httpClienFactory.CreateClient("HttpClient");
-        }            
+        }
 
         public async Task<IEnumerable<SpecializationDTO>> GetAllSpecialization()
         {
@@ -18,7 +18,7 @@ namespace SibCCSPETest.ServiceBase
             {
                 var response = await _httpClient.GetAsync("api/specializations");
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<List<SpecializationDTO>>();
+                return await response.Content.ReadFromJsonAsync<List<SpecializationDTO>>() ?? [];
             }
             catch (HttpRequestException ex)
             {
@@ -27,7 +27,7 @@ namespace SibCCSPETest.ServiceBase
             }
         }
 
-        public async Task<SpecializationDTO> GetSpecialization(int id)
+        public async Task<SpecializationDTO?> GetSpecialization(int id)
         {
             try
             {
@@ -38,22 +38,52 @@ namespace SibCCSPETest.ServiceBase
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"API Error: {ex.Message}");
-                return new SpecializationDTO();
+                return null;
             }
         }
 
-        public async Task<SpecializationDTO> AddSpecialization(SpecializationDTO item)
+        public async Task<SpecializationDTO?> AddSpecialization(SpecializationDTO item)
         {
-            using var response = await _httpClient.PostAsJsonAsync("api/specializations", item);
-            SpecializationDTO? specialization = await response.Content.ReadFromJsonAsync<SpecializationDTO>();
-            return specialization;
+            try
+            {
+                using var response = await _httpClient.PostAsJsonAsync("api/specializations", item);
+                response.EnsureSuccessStatusCode();
+                SpecializationDTO? specialization = await response.Content.ReadFromJsonAsync<SpecializationDTO>();
+                return specialization;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
         }
-            
 
         public async Task UpdateSpecialization(SpecializationDTO item)
-            => await _httpClient.PutAsJsonAsync("api/specializations", item);
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/specializations");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.PutAsJsonAsync("api/specializations", item);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
 
         public async Task DeleteSpecialization(int id)
-            =>  await _httpClient.DeleteAsync($"api/specializations/{id}");
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/specializations");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.DeleteAsync($"api/specializations/{id}");
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
     }
 }
