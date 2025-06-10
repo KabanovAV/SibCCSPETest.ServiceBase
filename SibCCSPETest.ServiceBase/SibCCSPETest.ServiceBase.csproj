@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="SibCCSPETest.Data">
+      <HintPath>..\..\SibCCSPETest.Data\SibCCSPETest.Data\bin\Debug\net8.0\SibCCSPETest.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="SibCCSPETest.Data.Interop">
+      <HintPath>..\..\SibCCSPETest.Data\SibCCSPETest.Data.Interop\bin\Debug\net8.0\SibCCSPETest.Data.Interop.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
