@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SibCCSPETest.Data\SibCCSPETest.Data.Interop\SibCCSPETest.Data.Interop.csproj" />
     <ProjectReference Include="..\..\SibCCSPETest.Data\SibCCSPETest.Data\SibCCSPETest.Data.csproj" />
   </ItemGroup>
 
