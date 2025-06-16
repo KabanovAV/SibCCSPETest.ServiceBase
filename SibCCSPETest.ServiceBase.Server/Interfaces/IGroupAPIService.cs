@@ -1,15 +1,13 @@
-﻿//using SibCCSPETest.Data;
-//using System.Linq.Expressions;
+﻿using SibCCSPETest.Data;
 
-//namespace SibCCSPETest.ServiceBase
-//{
-//    public interface IGroupService
-//    {
-//        IEnumerable<Group> GetAllGroup(Expression<Func<Group, bool>>? expression = null, string? includeProperties = null);
-//        Group GetGroup(Expression<Func<Group, bool>> expression, string? includeProperties = null);
-//        void AddGroup(Group entity);
-//        void UpdateGroup(Group entity);
-//        void DeleteGroup(Group entity);
-//        void RefreshGroup(Group entity);
-//    }
-//}
+namespace SibCCSPETest.ServiceBase
+{
+    public interface IGroupAPIService
+    {
+        Task<IEnumerable<GroupDTO>> GetAllGroup();
+        Task<GroupDTO?> GetGroup(int id);
+        Task<GroupDTO?> AddGroup(GroupDTO item);
+        Task UpdateGroup(GroupDTO item);
+        Task DeleteGroup(int id);
+    }
+}

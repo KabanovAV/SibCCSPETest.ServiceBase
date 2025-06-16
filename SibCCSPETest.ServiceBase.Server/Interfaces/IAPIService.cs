@@ -3,8 +3,8 @@
     public interface IAPIService
     {
         ISpecializationAPIService SpecializationService { get; }
+        IGroupAPIService GroupService { get; }
         //IAnswerService AnswerService { get; }
-        //IGroupService GroupService { get; }
         //IQuestionService QuestionService { get; }
         //IResultService ResultService { get; }
         //ISettingService SettingService { get; }

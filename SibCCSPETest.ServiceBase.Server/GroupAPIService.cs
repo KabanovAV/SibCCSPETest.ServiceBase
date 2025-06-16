@@ -1,39 +1,90 @@
-﻿//using SibCCSPETest.Data;
-//using System.Linq.Expressions;
+﻿using SibCCSPETest.Data;
+using System.Linq.Expressions;
+using System.Net.Http.Json;
 
-//namespace SibCCSPETest.ServiceBase
-//{
-//    public class GroupService : IGroupService
-//    {
-//        private readonly IRepositoryManager _repository;
+namespace SibCCSPETest.ServiceBase
+{
+    public class GroupAPIService : IGroupAPIService
+    {
+        private readonly HttpClient _httpClient;
 
-//        public GroupService(IRepositoryManager repository)
-//            => _repository = repository;
+        public GroupAPIService(IHttpClientFactory httpClienFactory)
+        {
+            _httpClient = httpClienFactory.CreateClient("HttpClient");
+        }
 
-//        public IEnumerable<Group> GetAllGroup(Expression<Func<Group, bool>>? expression = null, string? includeProperties = null)
-//            => _repository.Group.GetAllGroup(expression, includeProperties);
+        public async Task<IEnumerable<GroupDTO>> GetAllGroup()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/groups");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<GroupDTO>>() ?? [];
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return new List<GroupDTO>();
+            }
+        }
 
-//        public Group GetGroup(Expression<Func<Group, bool>> expression, string? includeProperties = null)
-//            => _repository.Group.GetGroup(expression, includeProperties);
+        public async Task<GroupDTO?> GetGroup(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/groups/{id}");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<GroupDTO>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void AddGroup(Group entity)
-//        {
-//            _repository.Group.AddGroup(entity);
-//            _repository.Save();
-//        }
+        public async Task<GroupDTO?> AddGroup(GroupDTO item)
+        {
+            try
+            {
+                using var response = await _httpClient.PostAsJsonAsync("api/groups", item);
+                response.EnsureSuccessStatusCode();
+                GroupDTO? group = await response.Content.ReadFromJsonAsync<GroupDTO>();
+                return group;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void UpdateGroup(Group entity)
-//        {
-//            _repository.Group.UpdateGroup(entity);
-//            _repository.Save();
-//        }
+        public async Task UpdateGroup(GroupDTO item)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/groups");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.PutAsJsonAsync("api/groups", item);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
 
-//        public void DeleteGroup(Group entity)
-//        {
-//            _repository.Group.DeleteGroup(entity);
-//            _repository.Save();
-//        }
-
-//        public void RefreshGroup(Group entity) => _repository.Group.RefreshGroup(entity);
-//    }
-//}
+        public async Task DeleteGroup(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/groups");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.DeleteAsync($"api/groups/{id}");
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
+    }
+}

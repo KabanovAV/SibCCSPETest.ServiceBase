@@ -2,9 +2,9 @@
 {
     public class APIService : IAPIService
     {
-        private ISpecializationAPIService _specializationService;
+        private readonly Lazy<ISpecializationAPIService> _specializationService;
+        private readonly Lazy<IGroupAPIService> _groupService;
         //private readonly Lazy<IAnswerService> _answerService;
-        //private readonly Lazy<IGroupService> _groupService;
         //private readonly Lazy<IQuestionService> _questionService;
         //private readonly Lazy<IResultService> _resultService;
         //private readonly Lazy<ISettingService> _settingService;
@@ -15,9 +15,9 @@
 
         public APIService(IHttpClientFactory httpClienFactory)
         {
-            _specializationService = new SpecializationAPIService(httpClienFactory);
+            _specializationService = new Lazy<ISpecializationAPIService>(() => new SpecializationAPIService(httpClienFactory));
+            _groupService = new Lazy<IGroupAPIService>(() => new GroupAPIService(httpClienFactory));
             //_answerService = new Lazy<IAnswerService>(() => new AnswerService(repository));
-            //_groupService = new Lazy<IGroupService>(() => new GroupService(repository));
             //_questionService = new Lazy<IQuestionService>(() => new QuestionService(repository));
             //_resultService = new Lazy<IResultService>(() => new ResultService(repository));
             //_settingService = new Lazy<ISettingService>(() => new SettingService(repository));
@@ -27,11 +27,11 @@
             //_userService = new Lazy<IUserService>(() => new UserService(repository));
         }
 
-        public ISpecializationAPIService SpecializationService => _specializationService;
+        public ISpecializationAPIService SpecializationService => _specializationService.Value;
+        public IGroupAPIService GroupService => _groupService.Value;
 
         //public ISpecializationService SpecializationService => _specializationService.Value;
         //public IAnswerService AnswerService => _answerService.Value;
-        //public IGroupService GroupService => _groupService.Value;
         //public IQuestionService QuestionService => _questionService.Value;
         //public IResultService ResultService => _resultService.Value;
         //public ISettingService SettingService => _settingService.Value;
