@@ -1,15 +1,13 @@
-﻿//using SibCCSPETest.Data;
-//using System.Linq.Expressions;
+﻿using SibCCSPETest.Data;
 
-//namespace SibCCSPETest.ServiceBase
-//{
-//    public interface IAnswerService
-//    {
-//        IEnumerable<Answer> GetAllAnswer(Expression<Func<Answer, bool>>? expression = null, string? includeProperties = null);
-//        Answer GetAnswer(Expression<Func<Answer, bool>> expression, string? includeProperties = null);
-//        void AddAnswer(Answer entity);
-//        void UpdateAnswer(Answer entity);
-//        void DeleteAnswer(Answer entity);
-//        void RefreshAnswer(Answer entity);
-//    }
-//}
+namespace SibCCSPETest.ServiceBase
+{
+    public interface IAnswerAPIService
+    {
+        Task<IEnumerable<AnswerDTO>> GetAllAnswer();
+        Task<AnswerDTO?> GetAnswer(int id);
+        Task<AnswerDTO?> AddAnswer(AnswerDTO item);
+        Task UpdateAnswer(AnswerDTO item);
+        Task DeleteAnswer(int id);
+    }
+}

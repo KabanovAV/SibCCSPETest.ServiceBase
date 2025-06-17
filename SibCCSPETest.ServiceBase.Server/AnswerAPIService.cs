@@ -1,39 +1,89 @@
-﻿//using SibCCSPETest.Data;
-//using System.Linq.Expressions;
+﻿using SibCCSPETest.Data;
+using System.Net.Http.Json;
 
-//namespace SibCCSPETest.ServiceBase
-//{
-//    public class AnswerService : IAnswerService
-//    {
-//        private readonly IRepositoryManager _repository;
+namespace SibCCSPETest.ServiceBase
+{
+    public class AnswerAPIService : IAnswerAPIService
+    {
+        private readonly HttpClient _httpClient;
 
-//        public AnswerService(IRepositoryManager repository)
-//            => _repository = repository;
+        public AnswerAPIService(IHttpClientFactory httpClienFactory)
+        {
+            _httpClient = httpClienFactory.CreateClient("HttpClient");
+        }
 
-//        public IEnumerable<Answer> GetAllAnswer(Expression<Func<Answer, bool>>? expression = null, string? includeProperties = null)
-//            => _repository.Answer.GetAllAnswer(expression, includeProperties);
+        public async Task<IEnumerable<AnswerDTO>> GetAllAnswer()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/answers");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<AnswerDTO>>() ?? [];
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return new List<AnswerDTO>();
+            }
+        }
 
-//        public Answer GetAnswer(Expression<Func<Answer, bool>> expression, string? includeProperties = null)
-//            => _repository.Answer.GetAnswer(expression, includeProperties);
+        public async Task<AnswerDTO?> GetAnswer(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/answers/{id}");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<AnswerDTO>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void AddAnswer(Answer entity)
-//        {
-//            _repository.Answer.AddAnswer(entity);
-//            _repository.Save();
-//        }
+        public async Task<AnswerDTO?> AddAnswer(AnswerDTO item)
+        {
+            try
+            {
+                using var response = await _httpClient.PostAsJsonAsync("api/answers", item);
+                response.EnsureSuccessStatusCode();
+                AnswerDTO? answer = await response.Content.ReadFromJsonAsync<AnswerDTO>();
+                return answer;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void UpdateAnswer(Answer entity)
-//        {
-//            _repository.Answer.UpdateAnswer(entity);
-//            _repository.Save();
-//        }
+        public async Task UpdateAnswer(AnswerDTO item)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/answers");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.PutAsJsonAsync("api/answers", item);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
 
-//        public void DeleteAnswer(Answer entity)
-//        {
-//            _repository.Answer.DeleteAnswer(entity);
-//            _repository.Save();
-//        }
-
-//        public void RefreshAnswer(Answer entity) => _repository.Answer.RefreshAnswer(entity);
-//    }
-//}
+        public async Task DeleteAnswer(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/answers");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.DeleteAsync($"api/answers/{id}");
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
+    }
+}

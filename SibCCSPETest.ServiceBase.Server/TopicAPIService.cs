@@ -1,39 +1,89 @@
-﻿//using SibCCSPETest.Data;
-//using System.Linq.Expressions;
+﻿using SibCCSPETest.Data;
+using System.Net.Http.Json;
 
-//namespace SibCCSPETest.ServiceBase
-//{
-//    public class TopicService : ITopicService
-//    {
-//        private readonly IRepositoryManager _repository;
+namespace SibCCSPETest.ServiceBase
+{
+    public class TopicAPIService : ITopicAPIService
+    {
+        private readonly HttpClient _httpClient;
 
-//        public TopicService(IRepositoryManager repository)
-//            => _repository = repository;
+        public TopicAPIService(IHttpClientFactory httpClienFactory)
+        {
+            _httpClient = httpClienFactory.CreateClient("HttpClient");
+        }
 
-//        public IEnumerable<Topic> GetAllTopic(Expression<Func<Topic, bool>>? expression = null, string? includeProperties = null)
-//            => _repository.Topic.GetAllTopic(expression, includeProperties);
+        public async Task<IEnumerable<TopicDTO>> GetAllTopic()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/topics");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<TopicDTO>>() ?? [];
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return new List<TopicDTO>();
+            }
+        }
 
-//        public Topic GetTopic(Expression<Func<Topic, bool>> expression, string? includeProperties = null)
-//            => _repository.Topic.GetTopic(expression, includeProperties);
+        public async Task<TopicDTO?> GetTopic(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/topics/{id}");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<TopicDTO>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void AddTopic(Topic entity)
-//        {
-//            _repository.Topic.AddTopic(entity);
-//            _repository.Save();
-//        }
+        public async Task<TopicDTO?> AddTopic(TopicDTO item)
+        {
+            try
+            {
+                using var response = await _httpClient.PostAsJsonAsync("api/topics", item);
+                response.EnsureSuccessStatusCode();
+                TopicDTO? topic = await response.Content.ReadFromJsonAsync<TopicDTO>();
+                return topic;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void UpdateTopic(Topic entity)
-//        {
-//            _repository.Topic.UpdateTopic(entity);
-//            _repository.Save();
-//        }
+        public async Task UpdateTopic(TopicDTO item)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/topics");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.PutAsJsonAsync("api/topics", item);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
 
-//        public void DeleteTopic(Topic entity)
-//        {
-//            _repository.Topic.DeleteTopic(entity);
-//            _repository.Save();
-//        }
-
-//        public void RefreshTopic(Topic entity) => _repository.Topic.RefreshTopic(entity);
-//    }
-//}
+        public async Task DeleteTopic(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/topics");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.DeleteAsync($"api/topics/{id}");
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
+    }
+}

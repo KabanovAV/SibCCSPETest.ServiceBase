@@ -1,39 +1,89 @@
-﻿//using SibCCSPETest.Data;
-//using System.Linq.Expressions;
+﻿using SibCCSPETest.Data;
+using System.Net.Http.Json;
 
-//namespace SibCCSPETest.ServiceBase
-//{
-//    public class UserService : IUserService
-//    {
-//        private readonly IRepositoryManager _repository;
+namespace SibCCSPETest.ServiceBase
+{
+    public class UserAPIService : IUserAPIService
+    {
+        private readonly HttpClient _httpClient;
 
-//        public UserService(IRepositoryManager repository)
-//            => _repository = repository;
+        public UserAPIService(IHttpClientFactory httpClienFactory)
+        {
+            _httpClient = httpClienFactory.CreateClient("HttpClient");
+        }
 
-//        public IEnumerable<User> GetAllUser(Expression<Func<User, bool>>? expression = null, string? includeProperties = null)
-//            => _repository.User.GetAllUser(expression, includeProperties);
+        public async Task<IEnumerable<UserDTO>> GetAllUser()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/users");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<UserDTO>>() ?? [];
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return new List<UserDTO>();
+            }
+        }
 
-//        public User GetUser(Expression<Func<User, bool>> expression, string? includeProperties = null)
-//            => _repository.User.GetUser(expression, includeProperties);
+        public async Task<UserDTO?> GetUser(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/users/{id}");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<UserDTO>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void AddUser(User entity)
-//        {
-//            _repository.User.AddUser(entity);
-//            _repository.Save();
-//        }
+        public async Task<UserDTO?> AddUser(UserDTO item)
+        {
+            try
+            {
+                using var response = await _httpClient.PostAsJsonAsync("api/users", item);
+                response.EnsureSuccessStatusCode();
+                UserDTO? user = await response.Content.ReadFromJsonAsync<UserDTO>();
+                return user;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void UpdateUser(User entity)
-//        {
-//            _repository.User.UpdateUser(entity);
-//            _repository.Save();
-//        }
+        public async Task UpdateUser(UserDTO item)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/users");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.PutAsJsonAsync("api/users", item);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
 
-//        public void DeleteUser(User entity)
-//        {
-//            _repository.User.DeleteUser(entity);
-//            _repository.Save();
-//        }
-
-//        public void RefreshUser(User entity) => _repository.User.RefreshUser(entity);
-//    }
-//}
+        public async Task DeleteUser(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/users");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.DeleteAsync($"api/users/{id}");
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
+    }
+}

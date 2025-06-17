@@ -1,39 +1,89 @@
-﻿//using SibCCSPETest.Data;
-//using System.Linq.Expressions;
+﻿using SibCCSPETest.Data;
+using System.Net.Http.Json;
 
-//namespace SibCCSPETest.ServiceBase
-//{
-//    public class QuestionService : IQuestionService
-//    {
-//        private readonly IRepositoryManager _repository;
+namespace SibCCSPETest.ServiceBase
+{
+    public class QuestionAPIService : IQuestionAPIService
+    {
+        private readonly HttpClient _httpClient;
 
-//        public QuestionService(IRepositoryManager repository)
-//            => _repository = repository;
+        public QuestionAPIService(IHttpClientFactory httpClienFactory)
+        {
+            _httpClient = httpClienFactory.CreateClient("HttpClient");
+        }
 
-//        public IEnumerable<Question> GetAllQuestion(Expression<Func<Question, bool>>? expression = null, string? includeProperties = null)
-//            => _repository.Question.GetAllQuestion(expression, includeProperties);
+        public async Task<IEnumerable<QuestionDTO>> GetAllQuestion()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/questions");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<QuestionDTO>>() ?? [];
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return new List<QuestionDTO>();
+            }
+        }
 
-//        public Question GetQuestion(Expression<Func<Question, bool>> expression, string? includeProperties = null)
-//            => _repository.Question.GetQuestion(expression, includeProperties);
+        public async Task<QuestionDTO?> GetQuestion(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/questions/{id}");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<QuestionDTO>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void AddQuestion(Question entity)
-//        {
-//            _repository.Question.AddQuestion(entity);
-//            _repository.Save();
-//        }
+        public async Task<QuestionDTO?> AddQuestion(QuestionDTO item)
+        {
+            try
+            {
+                using var response = await _httpClient.PostAsJsonAsync("api/questions", item);
+                response.EnsureSuccessStatusCode();
+                QuestionDTO? question = await response.Content.ReadFromJsonAsync<QuestionDTO>();
+                return question;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
 
-//        public void UpdateQuestion(Question entity)
-//        {
-//            _repository.Question.UpdateQuestion(entity);
-//            _repository.Save();
-//        }
+        public async Task UpdateQuestion(QuestionDTO item)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/questions");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.PutAsJsonAsync("api/questions", item);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
 
-//        public void DeleteQuestion(Question entity)
-//        {
-//            _repository.Question.DeleteQuestion(entity);
-//            _repository.Save();
-//        }
-        
-//        public void RefreshQuestion(Question entity) => _repository.Question.RefreshQuestion(entity);
-//    }
-//}
+        public async Task DeleteQuestion(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/questions");
+                response.EnsureSuccessStatusCode();
+                await _httpClient.DeleteAsync($"api/questions/{id}");
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+            }
+        }
+    }
+}
