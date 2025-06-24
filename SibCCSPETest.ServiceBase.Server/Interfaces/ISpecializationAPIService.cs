@@ -5,6 +5,7 @@ namespace SibCCSPETest.ServiceBase
     public interface ISpecializationAPIService
     {
         Task<IEnumerable<SpecializationDTO>> GetAllSpecialization();
+        Task<IEnumerable<SelectItem>> GetSpecializationSelect();
         Task<SpecializationDTO?> GetSpecialization(int id);
         Task<SpecializationDTO?> AddSpecialization(SpecializationDTO item);
         Task UpdateSpecialization(SpecializationDTO item);

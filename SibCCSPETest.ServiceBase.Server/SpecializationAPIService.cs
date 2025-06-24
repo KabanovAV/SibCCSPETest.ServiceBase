@@ -27,6 +27,12 @@ namespace SibCCSPETest.ServiceBase
             }
         }
 
+        public async Task<IEnumerable<SelectItem>> GetSpecializationSelect()
+        {
+            var s = await GetAllSpecialization();
+            return s.Select(s => new SelectItem { Text = s.Title, Value = s.Id }).ToList();
+        }
+
         public async Task<SpecializationDTO?> GetSpecialization(int id)
         {
             try
