@@ -48,8 +48,7 @@ namespace SibCCSPETest.ServiceBase
             {
                 using var response = await _httpClient.PostAsJsonAsync("api/groups", item);
                 response.EnsureSuccessStatusCode();
-                GroupDTO? group = await response.Content.ReadFromJsonAsync<GroupDTO>();
-                return group;
+                return await response.Content.ReadFromJsonAsync<GroupDTO>();
             }
             catch (HttpRequestException ex)
             {
@@ -58,17 +57,18 @@ namespace SibCCSPETest.ServiceBase
             }
         }
 
-        public async Task UpdateGroup(GroupDTO item)
+        public async Task<GroupDTO?> UpdateGroup(GroupDTO item)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/groups");
+                var response = await _httpClient.PutAsJsonAsync("api/groups", item);
                 response.EnsureSuccessStatusCode();
-                await _httpClient.PutAsJsonAsync("api/groups", item);
+                return await response.Content.ReadFromJsonAsync<GroupDTO>();
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"API Error: {ex.Message}");
+                return null;
             }
         }
 
@@ -76,9 +76,8 @@ namespace SibCCSPETest.ServiceBase
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/groups");
-                response.EnsureSuccessStatusCode();
-                await _httpClient.DeleteAsync($"api/groups/{id}");
+                var response = await _httpClient.DeleteAsync($"api/groups/{id}");
+                response.EnsureSuccessStatusCode();                
             }
             catch (HttpRequestException ex)
             {

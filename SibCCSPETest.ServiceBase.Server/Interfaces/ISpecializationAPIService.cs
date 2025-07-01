@@ -8,7 +8,7 @@ namespace SibCCSPETest.ServiceBase
         Task<IEnumerable<SelectItem>> GetSpecializationSelect();
         Task<SpecializationDTO?> GetSpecialization(int id);
         Task<SpecializationDTO?> AddSpecialization(SpecializationDTO item);
-        Task UpdateSpecialization(SpecializationDTO item);
+        Task<SpecializationDTO?> UpdateSpecialization(SpecializationDTO item);
         Task DeleteSpecialization(int id);
     }
 }

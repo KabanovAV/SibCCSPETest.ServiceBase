@@ -16,19 +16,21 @@ namespace SibCCSPETest.ServiceBase
         public async Task<User> GetUserAsync(Expression<Func<User, bool>> expression, string? includeProperties = null)
             => await _repository.User.GetUserAsync(expression, includeProperties);
 
-        public async Task AddUserAsync(User entity)
+        public async Task<User> AddUserAsync(User entity, string? includeProperties = null)
         {
             entity.CreatedDate = DateTime.Now;
             entity.ChangedDate = DateTime.Now;
             await _repository.User.AddUserAsync(entity);
             _repository.Save();
+            return await _repository.User.GetUserAsync(g => g.Id == entity.Id, includeProperties);
         }
 
-        public void UpdateUser(User entity)
+        public async Task<User> UpdateUser(User entity, string? includeProperties = null)
         {
             entity.ChangedDate = DateTime.Now;
             _repository.User.UpdateUser(entity);
             _repository.Save();
+            return await _repository.User.GetUserAsync(g => g.Id == entity.Id, includeProperties);
         }
 
         public void DeleteUser(User entity)

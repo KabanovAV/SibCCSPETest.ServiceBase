@@ -54,8 +54,7 @@ namespace SibCCSPETest.ServiceBase
             {
                 using var response = await _httpClient.PostAsJsonAsync("api/specializations", item);
                 response.EnsureSuccessStatusCode();
-                SpecializationDTO? specialization = await response.Content.ReadFromJsonAsync<SpecializationDTO>();
-                return specialization;
+                return await response.Content.ReadFromJsonAsync<SpecializationDTO>();
             }
             catch (HttpRequestException ex)
             {
@@ -64,17 +63,18 @@ namespace SibCCSPETest.ServiceBase
             }
         }
 
-        public async Task UpdateSpecialization(SpecializationDTO item)
+        public async Task<SpecializationDTO?> UpdateSpecialization(SpecializationDTO item)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/specializations");
+                var response = await _httpClient.PutAsJsonAsync("api/specializations", item);
                 response.EnsureSuccessStatusCode();
-                await _httpClient.PutAsJsonAsync("api/specializations", item);
+                return await response.Content.ReadFromJsonAsync<SpecializationDTO>();
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"API Error: {ex.Message}");
+                return null;
             }
         }
 
@@ -82,9 +82,8 @@ namespace SibCCSPETest.ServiceBase
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/specializations");
-                response.EnsureSuccessStatusCode();
-                await _httpClient.DeleteAsync($"api/specializations/{id}");
+                var response = await _httpClient.DeleteAsync($"api/specializations/{id}");
+                response.EnsureSuccessStatusCode();                
             }
             catch (HttpRequestException ex)
             {

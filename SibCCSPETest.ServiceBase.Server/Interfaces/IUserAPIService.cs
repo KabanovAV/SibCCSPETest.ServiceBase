@@ -7,7 +7,7 @@ namespace SibCCSPETest.ServiceBase
         Task<IEnumerable<UserDTO>> GetAllUser();
         Task<UserDTO?> GetUser(int id);
         Task<UserDTO?> AddUser(UserDTO item);
-        Task UpdateUser(UserDTO item);
+        Task<UserDTO?> UpdateUser(UserDTO item);
         Task DeleteUser(int id);
     }
 }

@@ -16,19 +16,21 @@ namespace SibCCSPETest.ServiceBase
         public async Task<Setting> GetSettingAsync(Expression<Func<Setting, bool>> expression, string? includeProperties = null)
             => await _repository.Setting.GetSettingAsync(expression, includeProperties);
 
-        public async Task AddSettingAsync(Setting entity)
+        public async Task<Setting> AddSettingAsync(Setting entity, string? includeProperties = null)
         {
             entity.CreatedDate = DateTime.Now;
             entity.ChangedDate = DateTime.Now;
             await _repository.Setting.AddSettingAsync(entity);
             _repository.Save();
+            return await _repository.Setting.GetSettingAsync(s => s.Id == entity.Id, includeProperties);
         }
 
-        public void UpdateSetting(Setting entity)
+        public async Task<Setting> UpdateSetting(Setting entity, string? includeProperties = null)
         {
             entity.ChangedDate = DateTime.Now;
             _repository.Setting.UpdateSetting(entity);
             _repository.Save();
+            return await _repository.Setting.GetSettingAsync(s => s.Id == entity.Id, includeProperties);
         }
 
         public void DeleteSetting(Setting entity)

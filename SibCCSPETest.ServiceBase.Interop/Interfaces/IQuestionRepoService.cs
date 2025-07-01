@@ -7,8 +7,8 @@ namespace SibCCSPETest.ServiceBase
     {
         Task<IEnumerable<Question>> GetAllQuestionAsync(Expression<Func<Question, bool>>? expression = null, string? includeProperties = null);
         Task<Question> GetQuestionAsync(Expression<Func<Question, bool>> expression, string? includeProperties = null);
-        Task AddQuestionAsync(Question entity);
-        void UpdateQuestion(Question entity);
+        Task<Question> AddQuestionAsync(Question entity, string? includeProperties = null);
+        Task<Question> UpdateQuestion(Question entity, string? includeProperties = null);
         void DeleteQuestion(Question entity);
     }
 }

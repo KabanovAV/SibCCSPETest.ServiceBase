@@ -48,8 +48,7 @@ namespace SibCCSPETest.ServiceBase
             {
                 using var response = await _httpClient.PostAsJsonAsync("api/questions", item);
                 response.EnsureSuccessStatusCode();
-                QuestionDTO? question = await response.Content.ReadFromJsonAsync<QuestionDTO>();
-                return question;
+                return await response.Content.ReadFromJsonAsync<QuestionDTO>();
             }
             catch (HttpRequestException ex)
             {
@@ -58,17 +57,18 @@ namespace SibCCSPETest.ServiceBase
             }
         }
 
-        public async Task UpdateQuestion(QuestionDTO item)
+        public async Task<QuestionDTO?> UpdateQuestion(QuestionDTO item)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/questions");
+                var response = await _httpClient.PutAsJsonAsync("api/questions", item);
                 response.EnsureSuccessStatusCode();
-                await _httpClient.PutAsJsonAsync("api/questions", item);
+                return await response.Content.ReadFromJsonAsync<QuestionDTO>();
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"API Error: {ex.Message}");
+                return null;
             }
         }
 
@@ -76,9 +76,8 @@ namespace SibCCSPETest.ServiceBase
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/questions");
+                var response = await _httpClient.DeleteAsync($"api/questions/{id}");
                 response.EnsureSuccessStatusCode();
-                await _httpClient.DeleteAsync($"api/questions/{id}");
             }
             catch (HttpRequestException ex)
             {

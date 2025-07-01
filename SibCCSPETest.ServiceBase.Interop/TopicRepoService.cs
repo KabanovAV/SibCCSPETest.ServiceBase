@@ -16,19 +16,21 @@ namespace SibCCSPETest.ServiceBase
         public async Task<Topic> GetTopicAsync(Expression<Func<Topic, bool>> expression, string? includeProperties = null)
             => await _repository.Topic.GetTopicAsync(expression, includeProperties);
 
-        public async Task AddTopicAsync(Topic entity)
+        public async Task<Topic> AddTopicAsync(Topic entity, string? includeProperties = null)
         {
             entity.CreatedDate = DateTime.Now;
             entity.ChangedDate = DateTime.Now;
             await _repository.Topic.AddTopicAsync(entity);
             _repository.Save();
+            return await _repository.Topic.GetTopicAsync(t => t.Id == entity.Id, includeProperties);
         }
 
-        public void UpdateTopic(Topic entity)
+        public async Task<Topic> UpdateTopic(Topic entity, string? includeProperties = null)
         {
             entity.ChangedDate = DateTime.Now;
             _repository.Topic.UpdateTopic(entity);
             _repository.Save();
+            return await _repository.Topic.GetTopicAsync(t => t.Id == entity.Id, includeProperties);
         }
 
         public void DeleteTopic(Topic entity)

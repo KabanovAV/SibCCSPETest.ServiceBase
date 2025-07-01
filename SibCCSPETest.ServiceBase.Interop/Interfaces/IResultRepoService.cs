@@ -7,8 +7,8 @@ namespace SibCCSPETest.ServiceBase
     {
         Task<IEnumerable<Result>> GetAllResultAsync(Expression<Func<Result, bool>>? expression = null, string? includeProperties = null);
         Task<Result> GetResultAsync(Expression<Func<Result, bool>> expression, string? includeProperties = null);
-        Task AddResultAsync(Result entity);
-        void UpdateResult(Result entity);
+        Task<Result> AddResultAsync(Result entity, string? includeProperties = null);
+        Task<Result> UpdateResult(Result entity, string? includeProperties = null);
         void DeleteResult(Result entity);
     }
 }

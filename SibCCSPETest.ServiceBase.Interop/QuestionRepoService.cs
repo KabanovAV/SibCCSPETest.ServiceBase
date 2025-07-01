@@ -16,19 +16,21 @@ namespace SibCCSPETest.ServiceBase
         public async Task<Question> GetQuestionAsync(Expression<Func<Question, bool>> expression, string? includeProperties = null)
             => await _repository.Question.GetQuestionAsync(expression, includeProperties);
 
-        public async Task AddQuestionAsync(Question entity)
+        public async Task<Question> AddQuestionAsync(Question entity, string? includeProperties = null)
         {
             entity.CreatedDate = DateTime.Now;
             entity.ChangedDate = DateTime.Now;
             await _repository.Question.AddQuestionAsync(entity);
             _repository.Save();
+            return await _repository.Question.GetQuestionAsync(q => q.Id == entity.Id, includeProperties);
         }
 
-        public void UpdateQuestion(Question entity)
+        public async Task<Question> UpdateQuestion(Question entity, string? includeProperties = null)
         {
             entity.ChangedDate = DateTime.Now;
             _repository.Question.UpdateQuestion(entity);
             _repository.Save();
+            return await _repository.Question.GetQuestionAsync(q => q.Id == entity.Id, includeProperties);
         }
 
         public void DeleteQuestion(Question entity)

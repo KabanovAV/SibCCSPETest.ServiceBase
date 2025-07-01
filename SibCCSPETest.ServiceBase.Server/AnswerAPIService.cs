@@ -48,8 +48,7 @@ namespace SibCCSPETest.ServiceBase
             {
                 using var response = await _httpClient.PostAsJsonAsync("api/answers", item);
                 response.EnsureSuccessStatusCode();
-                AnswerDTO? answer = await response.Content.ReadFromJsonAsync<AnswerDTO>();
-                return answer;
+                return await response.Content.ReadFromJsonAsync<AnswerDTO>();
             }
             catch (HttpRequestException ex)
             {
@@ -58,17 +57,33 @@ namespace SibCCSPETest.ServiceBase
             }
         }
 
-        public async Task UpdateAnswer(AnswerDTO item)
+        public async Task<IEnumerable<AnswerDTO>?> AddRangeAnswer(List<AnswerDTO> items)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/answers");
+                using var response = await _httpClient.PostAsJsonAsync("api/answers/addrange", items);
                 response.EnsureSuccessStatusCode();
-                await _httpClient.PutAsJsonAsync("api/answers", item);
+                return await response.Content.ReadFromJsonAsync<List<AnswerDTO>>();
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"API Error: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<AnswerDTO?> UpdateAnswer(AnswerDTO item)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync("api/answers", item);
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<AnswerDTO>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return null;
             }
         }
 
